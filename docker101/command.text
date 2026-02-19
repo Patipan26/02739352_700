@@ -1,0 +1,54 @@
+//คำสั่ง Docker พื้นฐานสำหรับการใช้งานและจัดการคอนเทนเนอร์และอิมเมจ
+docker -v 
+
+// ใช้ตรวจสอบว่าทำงานได้ถูกต้องหรือไม่ โดยการรันคอนเทนเนอร์ hello-world
+docker run hello-world
+
+//ตรวจสถานะคอนเทนเนอร์ทั้งหมด
+docker ps --all 
+
+//ตรวจสอบอิมเมจทั้งหมดที่มีอยู่ในเครื่อง
+docker images 
+
+//รันคอนเทนเนอร์จากอิมเมจ busybox และใช้คำสั่ง ping เพื่อทดสอบการเชื่อมต่ออินเทอร์เน็ต
+docker run busybox ping google.com 
+
+//หยุดคอนเทนเนอร์ที่กำลังทำงานอยู่
+docker stop <contrainer_id> 
+
+//ดึงอิมเมจจาก Docker Hub
+docker pull <image_name>
+
+//สร้างคอนเทนเนอร์จากอิมเมจ busybox แต่ยังไม่รันคอนเทนเนอร์
+docker create busybox ping google.com
+
+docker ps // ตรวจสอบสถานะคอนเทนเนอร์ที่กำลังทำงานทั้งหมด
+docker rm <contrainer_id> //ลบคอนเทนเนอร์ที่ไม่ต้องการ
+
+//ลบข้อมูลที่ไม่จำเป็นทั้งหมด เช่น คอนเทนเนอร์ที่หยุดแล้ว อิมเมจที่ไม่ได้ใช้งาน และเครือข่ายที่ไม่ได้ใช้งาน
+docker system prune
+ 
+docker run nginx //รันคอนเทนเนอร์ nginx
+
+//ระบบปฏิบัติการ linux
+docker exec -it <contrainer_id> sh //เข้าสู่คอนเทนเนอร์ที่กำลังทำงานอยู่ด้วยคำสั่ง bash
+docker exec -it <contrainer_id> bash //เข้าสู่คอนเทนเนอร์ที่กำลังทำงานอยู่ด้วยคำสั่ง bash
+ls //แสดงรายการไฟล์และโฟลเดอร์ภายในคอนเทนเนอร์
+exit //ออกจากคอนเทนเนอร์
+cd / usr/share/nginx/html //เปลี่ยนไดเรกทอรีไปยังโฟลเดอร์ที่เก็บไฟล์ HTML ของ nginx
+cat index.html //แสดงเนื้อหาของไฟล์ index.html
+docker run -d -p 8000:80 nginx //รันคอนเทนเนอร์ nginx ในโหมด detached และเชื่อมต่อพอร์ต 80 ของคอนเทนเนอร์กับพอร์ต 8000 ของโฮสต์
+docker image rm <image_id> //ลบอิมเมจที่ไม่ต้องการ
+docker pull pull wordpress //ดึงอิมเมจ WordPress จาก Docker Hub
+docker pull mysql:5.7 //ดึงอิมเมจ MySQL เวอร์ชัน 5.7 จาก Docker Hub
+docker pull phpmyadmin/phpmyadmin //ดึงอิมเมจ phpMyAdmin จาก Docker Hub
+docker network create wordpress //สร้างเครือข่าย Docker ชื่อ wordpress
+
+//รันคอนเทนเนอร์ MySQL และเชื่อมต่อกับเครือข่าย wordpress โดยตั้งค่ารหัสผ่าน root และข้อมูลฐานข้อมูลที่จำเป็นสำหรับการใช้งาน WordPress
+docker run --name mysql --network wordpress -e MYSQL_ROOT_PASSWORD=1111 -e MYSQL_DATABASE=wordpress_db -e MYSQL_USER=wordpress -e MYSQL_PASSWORD=wordpress -d mysql:5.7
+
+//รันคอนเทนเนอร์ WordPress และเชื่อมต่อกับเครือข่าย wordpress โดยตั้งค่าตัวแปรสภาพแวดล้อมสำหรับการเชื่อมต่อฐานข้อมูล MySQL
+docker run --name pma --network wordpress -p 8888:80 -e PMA_ARBITRARY=1 -d phpmyadmin/phpmyadmin
+
+//รันคอนเทนเนอร์ WordPress ในโหมด detached และเชื่อมต่อกับเครือข่าย wordpress โดยตั้งค่าตัวแปรสภาพแวดล้อมสำหรับการเชื่อมต่อฐานข้อมูล MySQL
+docker run -d --name wordpress --network wordpress -p 888:80 -e WORDPRESS_DB_HOST=mysql -e WORDPRESS_DB_USER=wordpress -e WORDPRESS_DB_PASSWORD=wordpress -e WORDPRESS_DB_NAME=wordpress_db wordpress
